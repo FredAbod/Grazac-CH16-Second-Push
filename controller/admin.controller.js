@@ -18,5 +18,21 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+const makeAdmin = async (req, res) => {
+  try {
+    const id = req.user.id;
+    const isAdmin = await User.findById(id);
 
-module.exports = { getAllUsers };
+    if (isAdmin.role !== "admin") {
+      return res.status(403).json({ message: "Access denied" });
+    }
+    const userId = req.params.id;
+    await User.findByIdAndUpdate(userId, { role: "admin" });
+    return res.status(200).json({ message: "User promoted to admin" });
+  } catch (error) {
+    console.error("Error promoting user:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+module.exports = { getAllUsers, makeAdmin };

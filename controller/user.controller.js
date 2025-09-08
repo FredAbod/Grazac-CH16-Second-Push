@@ -4,8 +4,8 @@ const jwt = require("jsonwebtoken");
 
 const signup = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-    if (!name || !email || !password) {
+    const { name, email, password, phoneNumber } = req.body;
+    if (!name || !email || !password || !phoneNumber) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -15,12 +15,21 @@ const signup = async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
+    //Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
     // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Create new user
-    const newUser = new User({ name, email, password: hashedPassword });
+    const newUser = new User({
+      name,
+      email,
+      password: hashedPassword,
+      otp,
+      phoneNumber,
+    });
     await newUser.save();
 
     res.status(201).json({ message: "User created successfully" });
@@ -43,6 +52,11 @@ const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    // Check if email is verified
+    if (!user.isVerified) {
+      return res.status(403).json({ message: "Email not verified" });
+    }
+
     // Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
@@ -62,7 +76,6 @@ const login = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 const updateUsername = async (req, res) => {
   try {
@@ -88,8 +101,39 @@ const updateUsername = async (req, res) => {
   }
 };
 
+const verifyOtp = async (req, res) => {
+  try {
+    const { otp } = req.body;
+    if (!otp) {
+      return res.status(400).json({ message: "OTP is required" });
+    }
+
+    // Check if user exists
+    const user = await User.findOne({ otp });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if OTP is valid
+    if (user.otp !== otp) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    // Mark email as verified
+    user.isVerified = true;
+    user.otp = null; // Clear OTP after verification
+    await user.save();
+
+    res.status(200).json({ message: "Email verified successfully" });
+  } catch (error) {
+    console.error("Error verifying OTP:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   signup,
   login,
   updateUsername,
+  verifyOtp,
 };
