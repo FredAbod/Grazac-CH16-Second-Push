@@ -1,6 +1,7 @@
 const User = require("../models/user.models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { sendEmail } = require("../config/email");
 
 const signup = async (req, res) => {
   try {
@@ -32,9 +33,11 @@ const signup = async (req, res) => {
     });
     await newUser.save();
 
+    await sendEmail(newUser.email, "Welcome to Our Service", `Your OTP is ${otp}`);
+
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {
-    console.error("Signup error:", error);
+    console.log("Signup error:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -123,6 +126,8 @@ const verifyOtp = async (req, res) => {
     user.isVerified = true;
     user.otp = null; // Clear OTP after verification
     await user.save();
+
+    await sendEmail(user.email, "OTP Verified", "You Just Verified Your Otp")
 
     res.status(200).json({ message: "Email verified successfully" });
   } catch (error) {
