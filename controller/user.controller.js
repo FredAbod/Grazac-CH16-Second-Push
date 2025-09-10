@@ -2,6 +2,7 @@ const User = require("../models/user.models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { sendEmail } = require("../config/email");
+const cloudinary  = require("../config/cloudinary");
 
 const signup = async (req, res) => {
   try {
@@ -191,11 +192,32 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const uploadProfilePicture = async (req, res) => {
+  try {
+    const { id } = req.user;
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    // Upload to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path);
+    const user = await User.findById(id);
+    user.profilePicture = result.secure_url;
+    await user.save();
+
+    res.status(200).json({ message: "Profile picture uploaded successfully", url: result.secure_url });
+  } catch (error) {
+    console.error("Error uploading profile picture:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   signup,
   login,
   updateUsername,
   verifyOtp,
+  uploadProfilePicture,
   forgotPassword,
   resetPassword
 };
