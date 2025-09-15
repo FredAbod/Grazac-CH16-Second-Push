@@ -34,7 +34,13 @@ const signup = async (req, res) => {
     });
     await newUser.save();
 
-    await sendEmail(newUser.email, "Welcome to Our Service", `Your OTP is ${otp}`);
+    // Send templated welcome + OTP email
+    await sendEmail(
+      newUser.email,
+      "Welcome to Our Service - Verify Your Email",
+      `Hi ${name}, your OTP is ${otp}. It expires in 10 minutes.`,
+      { template: 'singup.ejs', data: { name, otp, email } }
+    );
 
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {
@@ -128,7 +134,13 @@ const verifyOtp = async (req, res) => {
     user.otp = null; // Clear OTP after verification
     await user.save();
 
-    await sendEmail(user.email, "OTP Verified", "You Just Verified Your Otp")
+    // Send verification success email
+    await sendEmail(
+      user.email,
+      "Email Verified Successfully",
+      `Hi ${user.name}, your email has been verified. You can now log in and start using your account.`,
+      { template: 'verifyOtp.ejs', data: { name: user.name } }
+    )
 
     res.status(200).json({ message: "Email verified successfully" });
   } catch (error) {

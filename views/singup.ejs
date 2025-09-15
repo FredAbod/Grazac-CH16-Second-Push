@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Welcome - Account Verification</title>
+	<style>
+		body { font-family: Arial, Helvetica, sans-serif; background:#f4f7fb; margin:0; padding:0; }
+		.container { max-width:600px; margin:30px auto; background:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.08); }
+		.header { background:#0d47a1; padding:24px 24px 18px; color:#fff; }
+		.logo { font-size:22px; font-weight:600; letter-spacing:.5px; }
+		.hero { padding:30px 32px 10px; }
+		h1 { font-size:24px; margin:0 0 12px; color:#0d47a1; }
+		p { line-height:1.55; color:#333; margin:0 0 14px; }
+		.otp-box { background:#f0f5ff; border:1px solid #c2dafc; padding:18px 22px; text-align:center; border-radius:10px; letter-spacing:4px; font-size:28px; font-weight:700; color:#0d47a1; margin:26px 0 8px; font-family:'Courier New', monospace; }
+		.cta { display:inline-block; margin:24px 0 8px; background:#0d47a1; color:#fff !important; text-decoration:none; padding:14px 26px; border-radius:8px; font-weight:600; font-size:15px; }
+		.meta { font-size:12px; color:#555; margin-top:30px; }
+		.footer { background:#fafafa; padding:18px 24px; text-align:center; font-size:12px; color:#777; }
+		a { color:#0d47a1; }
+		.support { font-size:13px; margin-top:18px; }
+		@media (max-width:620px){ .hero { padding:26px 22px 4px; } h1 { font-size:21px; } .otp-box { font-size:24px; } }
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="header">
+			<div class="logo">YourApp</div>
+		</div>
+		<div class="hero">
+			<h1>Hi <%= name %>, Welcome!</h1>
+			<p>Thanks for creating an account with <strong>YourApp</strong>. To finish setting things up, please verify your email address using the One-Time Passcode (OTP) below.</p>
+			<div class="otp-box"><%= otp %></div>
+			<p style="font-size:13px; margin-top:4px; color:#555;">This code will expire in <strong>10 minutes</strong>. If it expires, you can request a new one from the app.</p>
+			<p>If you didn't sign up for this account, you can safely ignore this email.</p>
+			<p class="support">Need help? Reply to this email and our support team will assist you.</p>
+			<div class="meta">Sent to <%= email %></div>
+		</div>
+		<div class="footer">
+			&copy; <%= new Date().getFullYear() %> YourApp. All rights reserved.<br/>
+			<span>If you have trouble viewing this email, enable HTML in your mail client.</span>
+		</div>
+	</div>
+</body>
+</html>
